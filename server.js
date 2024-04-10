@@ -16,16 +16,12 @@ function sprawdzKlucz(req, res, next) {
     next();
 }
 
-app.get('/ytdl', async (req, res, next) => {
-    const apiKlucz = req.query.key;
-    req.query.key = undefined; 
-    req.url = req.originalUrl.replace(/&?key=[^&]*/, ''); 
-    next();
-}, sprawdzKlucz, async (req, res) => {
+app.get('/ytdl', sprawdzKlucz, async (req, res) => {
     try {
-        const url = req.query.url;
+        const key = req.query.key; 
+        const url = req.query.url; 
         if (!url || !ytdl.validateURL(url)) {
-            return res.status(400).send('Nieprawidłowy link YouTube, tytuł piosenki nie moze zawierać emoji');
+            return res.status(400).send('Nieprawidłowy link YouTube, tytuł piosenki nie może zawierać emoji');
         }
         const info = await ytdl.getInfo(url);
         const audioFormat = ytdl.chooseFormat(info.formats, { filter: 'audioonly' });
@@ -39,7 +35,7 @@ app.get('/ytdl', async (req, res, next) => {
         mp3Stream.pipe(res);
     } catch (error) {
         console.error('Error:', error);
-        res.status(500).send('Coś poszło nie tak, tytuł piosenki nie moze zawierać emoji');
+        res.status(500).send('Coś poszło nie tak, tytuł piosenki nie może zawierać emoji');
     }
 });
 
