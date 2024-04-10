@@ -6,7 +6,7 @@ const app = express();
 
 app.use(express.static('public'));
 
-const klucze = ["abcd"]; 
+const klucze = ["maKQafRFmw"]; 
 
 function sprawdzKlucz(req, res, next) {
     const apiKlucz = req.query.key;
