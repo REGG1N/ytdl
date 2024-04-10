@@ -1,4 +1,4 @@
-//tak uzywac = http://localhost:3000/ytdl?url=YT_LINK&key=MijhS2gIjd
+//tak uzywac = http://localhost:3000/ytdl?url=YT_LINK&key=
 const express = require('express');
 const ytdl = require('ytdl-core');
 const ffmpeg = require('fluent-ffmpeg');
@@ -6,7 +6,7 @@ const app = express();
 
 app.use(express.static('public'));
 
-const klucze = [""]; 
+const klucze = ["abcd"]; 
 
 function sprawdzKlucz(req, res, next) {
     const apiKlucz = req.query.key;
