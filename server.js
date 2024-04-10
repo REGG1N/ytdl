@@ -16,7 +16,12 @@ function sprawdzKlucz(req, res, next) {
     next();
 }
 
-app.get('/ytdl', sprawdzKlucz, async (req, res) => {
+app.get('/ytdl', async (req, res, next) => {
+    const apiKlucz = req.query.key;
+    req.query.key = undefined; 
+    req.url = req.originalUrl.replace(/&?key=[^&]*/, ''); 
+    next();
+}, sprawdzKlucz, async (req, res) => {
     try {
         const url = req.query.url;
         if (!url || !ytdl.validateURL(url)) {
