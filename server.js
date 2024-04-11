@@ -26,6 +26,7 @@ app.get('/ytdl', sprawdzKlucz, async (req, res) => {
         const info = await ytdl.getInfo(url);
         const audioFormat = ytdl.chooseFormat(info.formats, { filter: 'audioonly' });
         res.header('Content-Disposition', `attachment; filename="${sanitizeFilename(info.videoDetails.title)}.mp3"`);
+
         res.header('Content-Type', 'audio/mpeg');
         const mp3Stream = ytdl(url, {
             format: 'mp3',
@@ -45,5 +46,5 @@ app.listen(PORT, () => {
 });
 
 function sanitizeFilename(filename) {
-    return filename.replace(/[/\\?%*:|"<>]/g, '-');
+    return filename.replace(/[^\w\s\-]/g, '-');
 }
