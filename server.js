@@ -32,7 +32,7 @@ app.get('/ytdl', sprawdzKlucz, async (req, res) => {
         });
         mp3Stream.pipe(res);
     } catch (error) {
-        if (error instanceof Error && error.message.includes('Status code: 410')) {
+        if (error.message.includes('Status code: 410')) {
             return; // End the request if video is unavailable
         } else {
             console.error('Błąd:', error);
