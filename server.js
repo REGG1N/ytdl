@@ -1,4 +1,3 @@
-//tak uzywac = http://localhost:3000/ytdl?url=YT_LINK&key=
 const express = require('express');
 const ytdl = require('ytdl-core');
 const ffmpeg = require('fluent-ffmpeg');
@@ -18,15 +17,13 @@ function sprawdzKlucz(req, res, next) {
 
 app.get('/ytdl', sprawdzKlucz, async (req, res) => {
     try {
-        const key = req.query.key; 
-        const url = req.query.url; 
+        const url = req.query.url;
         if (!url || !ytdl.validateURL(url)) {
             return res.status(400).send('Nieprawidłowy link YouTube, tytuł piosenki nie może zawierać emoji');
         }
         const info = await ytdl.getInfo(url);
         const audioFormat = ytdl.chooseFormat(info.formats, { filter: 'audioonly' });
         res.header('Content-Disposition', `attachment; filename="${sanitizeFilename(info.videoDetails.title)}.mp3"`);
-
         res.header('Content-Type', 'audio/mpeg');
         const mp3Stream = ytdl(url, {
             format: 'mp3',
@@ -35,8 +32,12 @@ app.get('/ytdl', sprawdzKlucz, async (req, res) => {
         });
         mp3Stream.pipe(res);
     } catch (error) {
-        console.error('Error:', error);
-        res.status(500).send('Coś poszło nie tak, tytuł piosenki nie może zawierać emoji');
+        if (error instanceof ytdl.MinigetError && error.statusCode === 410) {
+            res.status(404).send('Żądany film nie jest dostępny.');
+        } else {
+            console.error('Błąd:', error);
+            res.status(500).send('Wystąpił błąd podczas przetwarzania żądania.');
+        }
     }
 });
 
@@ -46,5 +47,5 @@ app.listen(PORT, () => {
 });
 
 function sanitizeFilename(filename) {
-    return filename.replace(/[^\w\s\-]/g, '-');
+    return filename.replace(/[/\\?%*:|"<>]/g, '-');
 }
