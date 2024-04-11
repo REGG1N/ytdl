@@ -23,6 +23,9 @@ app.get('/ytdl', sprawdzKlucz, async (req, res) => {
             return res.status(400).send('Nieprawidłowy link YouTube, tytuł piosenki nie może zawierać emoji');
         }
         const info = await ytdl.getInfo(url);
+        if (!info) {
+            return res.status(404).send('Wskazany film na YouTube nie istnieje lub został usunięty.');
+        }
         const audioFormat = ytdl.chooseFormat(info.formats, { filter: 'audioonly' });
         res.header('Content-Disposition', `attachment; filename="${sanitizeFilename(info.videoDetails.title)}.mp3"`);
 
@@ -35,7 +38,11 @@ app.get('/ytdl', sprawdzKlucz, async (req, res) => {
         mp3Stream.pipe(res);
     } catch (error) {
         console.error('Error:', error);
-        res.status(500).send('Coś poszło nie tak, tytuł piosenki nie może zawierać emoji');
+        if (error.statusCode === 410) {
+            res.status(404).send('Wskazany film na YouTube nie istnieje lub został usunięty.');
+        } else {
+            res.status(500).send('Coś poszło nie tak, tytuł piosenki nie może zawierać emoji');
+        }
     }
 });
 
