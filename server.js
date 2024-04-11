@@ -32,8 +32,8 @@ app.get('/ytdl', sprawdzKlucz, async (req, res) => {
         });
         mp3Stream.pipe(res);
     } catch (error) {
-        if (error instanceof ytdl.MinigetError && error.statusCode === 410) {
-            res.status(404).send('Żądany film nie jest dostępny.');
+        if (error instanceof Error && error.message.includes('Status code: 410')) {
+            return; // End the request if video is unavailable
         } else {
             console.error('Błąd:', error);
             res.status(500).send('Wystąpił błąd podczas przetwarzania żądania.');
