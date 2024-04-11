@@ -50,7 +50,7 @@ app.get('/ytdl', sprawdzKlucz, async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
     console.log(`Serwer działa na porcie: ${PORT}`);
 });
