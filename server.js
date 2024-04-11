@@ -17,13 +17,15 @@ function sprawdzKlucz(req, res, next) {
 
 app.get('/ytdl', sprawdzKlucz, async (req, res) => {
     try {
-        const url = req.query.url;
+        const key = req.query.key; // Extract key first
+        const url = req.query.url; // Then extract URL
         if (!url || !ytdl.validateURL(url)) {
             return res.status(400).send('Nieprawidłowy link YouTube, tytuł piosenki nie może zawierać emoji');
         }
         const info = await ytdl.getInfo(url);
         const audioFormat = ytdl.chooseFormat(info.formats, { filter: 'audioonly' });
         res.header('Content-Disposition', `attachment; filename="${sanitizeFilename(info.videoDetails.title)}.mp3"`);
+
         res.header('Content-Type', 'audio/mpeg');
         const mp3Stream = ytdl(url, {
             format: 'mp3',
@@ -32,12 +34,8 @@ app.get('/ytdl', sprawdzKlucz, async (req, res) => {
         });
         mp3Stream.pipe(res);
     } catch (error) {
-        if (error.message.includes('Status code: 410')) {
-            return; // End the request if video is unavailable
-        } else {
-            console.error('Błąd:', error);
-            res.status(500).send('Wystąpił błąd podczas przetwarzania żądania.');
-        }
+        console.error('Error:', error);
+        res.status(500).send('Coś poszło nie tak, tytuł piosenki nie może zawierać emoji');
     }
 });
 
@@ -47,5 +45,5 @@ app.listen(PORT, () => {
 });
 
 function sanitizeFilename(filename) {
-    return filename.replace(/[/\\?%*:|"<>]/g, '-');
+    return filename.replace(/[^\w\s\-]/g, '-');
 }
