@@ -19,6 +19,7 @@ app.get('/ytdl', sprawdzKlucz, async (req, res) => {
     try {
         const key = req.query.key; // Extract key first
         const url = req.query.url; // Then extract URL
+        console.log('Requested URL:', url); // Log URL for debugging
         if (!url || !ytdl.validateURL(url)) {
             return res.status(400).send('Nieprawidłowy link YouTube, tytuł piosenki nie może zawierać emoji');
         }
@@ -45,6 +46,7 @@ app.get('/ytdl', sprawdzKlucz, async (req, res) => {
         }
     }
 });
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
